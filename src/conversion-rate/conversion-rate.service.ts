@@ -7,6 +7,13 @@ const INFRA_KEY = `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`;
 @Injectable()
 export class ConversionRateService {
   private readonly logger = new Logger(ConversionRateService.name);
+  provider = new ethers.JsonRpcProvider(INFRA_KEY);
+  pufETHAbi = ['function previewRedeem(uint256) view returns (uint256)'];
+  contract = new ethers.Contract(
+    process.env.PUFF_ETH_ADDRESS,
+    this.pufETHAbi,
+    this.provider,
+  );
 
   constructor(private prisma: PrismaService) {}
 
@@ -44,9 +51,11 @@ export class ConversionRateService {
       });
   }
 
-  async getConversionRate(period?: 'day' | 'week' | 'month') {
+  async getConversionRate(period?: 'day' | 'week' | 'month', page: number = 1) {
     const now = new Date();
     let dateFilter: Date | undefined;
+    const itemsPerPage = 100;
+    const skip = (page - 1) * itemsPerPage;
 
     switch (period) {
       case 'day':
@@ -62,21 +71,50 @@ export class ConversionRateService {
         dateFilter = undefined;
     }
 
-    const conversionRate = await this.prisma.conversionRate.findMany({
-      where: dateFilter
-        ? {
-            createdAt: {
-              gte: dateFilter,
-            },
-          }
-        : undefined,
-      orderBy: {
-        createdAt: 'desc',
+    const [conversionRates, total] = await Promise.all([
+      this.prisma.conversionRate.findMany({
+        where: dateFilter
+          ? {
+              createdAt: {
+                gte: dateFilter,
+              },
+            }
+          : undefined,
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: itemsPerPage,
+        skip,
+      }),
+      this.prisma.conversionRate.count({
+        where: dateFilter
+          ? {
+              createdAt: {
+                gte: dateFilter,
+              },
+            }
+          : undefined,
+      }),
+    ]);
+
+    return {
+      data: conversionRates,
+      metadata: {
+        total,
+        page,
+        totalPages: Math.ceil(total / itemsPerPage),
+        hasNextPage: skip + itemsPerPage < total,
       },
-    });
+    };
+  }
 
-    this.logger.debug(`Conversion rate: ${conversionRate}`);
+  async getCurrentConversionRate() {
+    const amount = ethers.parseEther('1');
+    const ethAmount = await this.contract.previewRedeem(amount);
 
-    return conversionRate;
+    return {
+      amount: Number(ethers.formatEther(amount)),
+      ethAmount: Number(ethers.formatEther(ethAmount)),
+    };
   }
 }

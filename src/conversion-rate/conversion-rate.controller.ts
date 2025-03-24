@@ -12,9 +12,12 @@ export class ConversionRateController {
   constructor(private readonly conversionRateService: ConversionRateService) {}
 
   @Get('history')
-  async getConversionRate(@Query('period') period?: 'day' | 'week' | 'month') {
+  async getConversionRate(
+    @Query('period') period?: 'day' | 'week' | 'month',
+    @Query('page') page?: number,
+  ) {
     try {
-      return await this.conversionRateService.getConversionRate(period);
+      return await this.conversionRateService.getConversionRate(period, page);
     } catch (error) {
       throw new HttpException(
         'Failed to fetch conversion rates',
@@ -26,7 +29,7 @@ export class ConversionRateController {
   @Get('current')
   async trackConversionRate() {
     try {
-      return await this.conversionRateService.trackConversionRate();
+      return await this.conversionRateService.getCurrentConversionRate();
     } catch (error) {
       throw new HttpException(
         'Failed to track current conversion rate',

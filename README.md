@@ -1,73 +1,116 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# PufETH Tracker Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A NestJS backend service for tracking PufETH conversion rates using PostgreSQL and Prisma.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
-
-```bash
-$ npm install
+## Technologies
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+- NestJS v11
+- PostgreSQL
+- Prisma ORM
+- Node.js (v23)
+- Cron Jobs for rate tracking
+- Puffer SDK for ETH conversions
 ```
 
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+## Project Structure
 ```
 
-## Support
+src/
+├── conversion-rate/       # Conversion rate module
+│   ├── controllers/      # API endpoints
+│   ├── services/        # Business logic
+│   └── types/          # Type definitions
+├── prisma/              # Prisma schema and migrations
+├── config/             # Configuration files
+└── utils/              # Utility functions
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Prerequisites
+```
+- Node.js v23
+- PostgreSQL
+- npm or yarn
+```
 
-## Stay in touch
+## Getting Started
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+1. Clone the repository:
+```
+git clone <repository-url>
+cd pufeth-tracker-backend
+```
+2. Set up environment variables:
+```
+cp .env.example .env
+```
 
-## License
+4. Install dependencies:
+```bash
+npm install
+```
 
-Nest is [MIT licensed](LICENSE).
+5. Generate Prisma client:
+```bash
+npx prisma generate
+```
+
+6. Run database migrations:
+```bash
+npx prisma migrate dev
+```
+
+7. Start the development server:
+```bash
+npm run start:dev
+```
+
+## Features
+
+- **Automated Rate Tracking**: Cron jobs fetch and store conversion rates periodically
+- **RESTful API**: Endpoints for retrieving historical and current rates
+- **Database Integration**: PostgreSQL with Prisma ORM for efficient data management
+
+## API Endpoints
+
+- `GET /conversion-rates`: Get historical conversion rates
+- `GET /conversion-rates/current`: Get current conversion rate
+
+## Database Schema
+
+The main tables include:
+- `ConversionRate`: Stores historical conversion rates
+- `Transaction`: Records individual transactions
+
+## Cron Jobs
+
+The application uses NestJS Scheduled Tasks to:
+- Fetch current rates every minute
+- Clean up old data daily
+- Generate statistical reports hourly
+
+## Environment Variables
+
+Required environment variables:
+- `DATABASE_URL`: PostgreSQL connection string
+- `PORT`: Application port (default: 3000)
+- `NODE_ENV`: Environment (development/production)
+
+## Development
+
+To run the project in development mode:
+
+1. Ensure Node.js v23 is installed:
+```bash
+node --version
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Start the development server:
+```bash
+npm run start:dev
+```

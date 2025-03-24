@@ -115,6 +115,7 @@ export class ConversionRateService {
     return {
       amount: Number(ethers.formatEther(amount)),
       ethAmount: Number(ethers.formatEther(ethAmount)),
+      createdAt: new Date(),
     };
   }
 }
